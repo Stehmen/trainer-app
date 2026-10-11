@@ -1,52 +1,52 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Trainer App — Portfolio Project 2</title>
+<title>Приложение тренера — проект портфолио</title>
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <header>
-  <h1>Trainer App</h1>
-  <p>Workout plans rendered from JSON. Log a session, export it as CSV.</p>
+  <h1>Приложение тренера</h1>
+  <p>Программы тренировок из JSON. Запишите сессию, выгрузите журнал в CSV.</p>
 </header>
 <main>
   <section class="filters">
-    <label>Focus
+    <label>Направление
       <select id="focusFilter">
-        <option value="all">All</option>
+        <option value="all">Все</option>
       </select>
     </label>
-    <label>Level
+    <label>Уровень
       <select id="levelFilter">
-        <option value="all">All</option>
+        <option value="all">Все</option>
       </select>
     </label>
   </section>
   <section id="timerPanel" class="timer hidden">
-    <h2 id="timerProgram">Workout</h2>
-    <div id="timerPhase" class="timer-phase work">READY</div>
+    <h2 id="timerProgram">Тренировка</h2>
+    <div id="timerPhase" class="timer-phase work">ГОТОВ</div>
     <div id="timerLabel" class="timer-label">—</div>
     <div id="timerClock" class="timer-clock">00:00</div>
     <div id="timerProgress" class="timer-progress"></div>
     <div class="timer-controls">
-      <button id="timerStartPause" type="button">Start</button>
-      <button id="timerSkip" type="button">Skip</button>
-      <button id="timerStop" type="button">Stop</button>
+      <button id="timerStartPause" type="button">Старт</button>
+      <button id="timerSkip" type="button">Пропустить</button>
+      <button id="timerStop" type="button">Стоп</button>
     </div>
   </section>
   <section id="programs" class="grid"></section>
   <section class="log">
-    <h2>Session log</h2>
+    <h2>Журнал тренировок</h2>
     <form id="logForm">
-      <input name="program" placeholder="Program title" required>
-      <input name="duration" type="number" min="1" placeholder="Minutes" required>
-      <input name="notes" placeholder="Notes (optional)">
-      <button type="submit">Save session</button>
+      <input name="program" placeholder="Название программы" required>
+      <input name="duration" type="number" min="1" placeholder="Минут" required>
+      <input name="notes" placeholder="Заметки (необязательно)">
+      <button type="submit">Сохранить тренировку</button>
     </form>
     <ul id="logList"></ul>
-    <button id="exportCsv" type="button">Export log as CSV</button>
+    <button id="exportCsv" type="button">Выгрузить журнал в CSV</button>
   </section>
 </main>
 <script src="js/app.js"></script>

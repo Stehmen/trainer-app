@@ -1,6 +1,8 @@
 const FALLBACK = { programs: [
-  { id: "boxing-base", title: "Boxing Base", focus: "boxing", level: "beginner", durationMin: 45, equipment: ["bag"], exercises: [{ name: "Shadow boxing", sets: 3, reps: "3 min", restSec: 60, workSec: 180 }] }
+  { id: "boxing-base", title: "Бокс: база", focus: "бокс", level: "начинающий", durationMin: 45, equipment: ["мешок"], exercises: [{ name: "Бой с тенью", sets: 3, reps: "3 мин", restSec: 60, workSec: 180 }] }
 ]};
+
+function today() { return new Date().toLocaleDateString("ru-RU"); }
 
 const state = { programs: [], log: JSON.parse(localStorage.getItem("trainerLog") || "[]") };
 
@@ -38,8 +40,8 @@ function render() {
       <h3>${p.title}</h3>
       <p class="meta">${p.focus} · ${p.level} · ${p.durationMin} min · ${p.equipment.join(", ")}</p>
       <ul>${p.exercises.map(e => `<li>${e.name} — ${e.sets}×${e.reps} (rest ${e.restSec}s)</li>`).join("")}</ul>
-      <button type="button" class="start-timer" data-id="${p.id}">Start timer</button>
-    </article>`).join("") || "<p>No programs match.</p>";
+      <button type="button" class="start-timer" data-id="${p.id}">Запустить таймер</button>
+    </article>`).join("") || "<p>Нет подходящих программ.</p>";
   renderLog();
   document.querySelectorAll(".start-timer").forEach(b =>
     b.addEventListener("click", () => startTimer(state.programs.find(p => p.id === b.dataset.id))));
@@ -59,14 +61,14 @@ function saveLog() {
 document.getElementById("logForm").addEventListener("submit", e => {
   e.preventDefault();
   const data = Object.fromEntries(new FormData(e.target));
-  state.log.push({ date: new Date().toISOString().slice(0, 10), ...data });
+  state.log.push({ date: today(), ...data });
   saveLog();
   e.target.reset();
   renderLog();
 });
 
 document.getElementById("exportCsv").addEventListener("click", () => {
-  const rows = [["date", "program", "duration", "notes"],
+  const rows = [["дата", "программа", "минут", "заметки"],
     ...state.log.map(s => [s.date, s.program, s.duration, s.notes || ""])];
   const csv = rows.map(r => r.map(v => `"${String(v).replaceAll('"', '""')}"`).join(",")).join("\n");
   const a = document.createElement("a");
@@ -109,7 +111,7 @@ function buildQueue(program) {
     const sets = e.sets || 1;
     for (let s = 1; s <= sets; s++) {
       works.push({
-        phase: "WORK",
+        phase: "РАБОТА",
         label: sets > 1 ? `${e.name} · ${s}/${sets}` : e.name,
         sec: e.workSec || 60,
         restSec: e.restSec || 60
@@ -119,7 +121,7 @@ function buildQueue(program) {
   const q = [];
   works.forEach((w, i) => {
     q.push(w);
-    if (i < works.length - 1) q.push({ phase: "REST", label: "Rest", sec: w.restSec });
+    if (i < works.length - 1) q.push({ phase: "ОТДЫХ", label: "Отдых", sec: w.restSec });
   });
   return q;
 }
@@ -132,14 +134,14 @@ function fmt(sec) {
 function updateTimerUI() {
   const cur = timer.queue[timer.idx];
   const phaseEl = document.getElementById("timerPhase");
-  document.getElementById("timerProgram").textContent = timer.program ? timer.program.title : "Workout";
-  phaseEl.textContent = cur ? cur.phase : "DONE";
-  phaseEl.className = "timer-phase " + (cur && cur.phase === "REST" ? "rest" : "work");
-  document.getElementById("timerLabel").textContent = cur ? cur.label : "Workout complete — logged ✓";
+  document.getElementById("timerProgram").textContent = timer.program ? timer.program.title : "Тренировка";
+  phaseEl.textContent = cur ? cur.phase : "ГОТОВО";
+  phaseEl.className = "timer-phase " + (cur && cur.phase === "ОТДЫХ" ? "rest" : "work");
+  document.getElementById("timerLabel").textContent = cur ? cur.label : "Тренировка завершена — записана ✓";
   document.getElementById("timerClock").textContent = fmt(timer.remaining);
   document.getElementById("timerProgress").textContent = cur ? `${timer.idx + 1} / ${timer.queue.length}` : "";
   document.getElementById("timerStartPause").textContent =
-    timer.running ? "Pause" : (timer.started ? "Resume" : "Start");
+    timer.running ? "Пауза" : (timer.started ? "Продолжить" : "Старт");
 }
 
 function tick() {
@@ -156,7 +158,7 @@ function tick() {
     timer.lastSec = null;
     if (timer.idx >= timer.queue.length) { finishTimer(); return; }
     timer.remaining = timer.queue[timer.idx].sec;
-    beep(timer.queue[timer.idx].phase === "REST" ? 520 : 880, 0.25); // phase change
+    beep(timer.queue[timer.idx].phase === "ОТДЫХ" ? 520 : 880, 0.25); // phase change
   }
   updateTimerUI();
 }
@@ -204,10 +206,10 @@ function finishTimer() {
   updateTimerUI();
   const mins = Math.max(1, Math.round((Date.now() - timer.startedAt) / 60000));
   state.log.push({
-    date: new Date().toISOString().slice(0, 10),
+    date: today(),
     program: timer.program.title,
     duration: String(mins),
-    notes: "timer"
+    notes: "таймер"
   });
   saveLog();
   renderLog();
